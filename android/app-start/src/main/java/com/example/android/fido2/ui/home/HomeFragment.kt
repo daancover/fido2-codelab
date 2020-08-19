@@ -101,8 +101,10 @@ class HomeFragment : Fragment(), DeleteConfirmationFragment.Listener {
                 if (intent.hasPendingIntent() && a != null) {
                     try {
 
-                        // TODO(2): Open the fingerprint dialog.
-                        // - Open the fingerprint dialog by launching the intent from FIDO2 API.
+                        // Open the fingerprint dialog.
+                        // Open the fingerprint dialog by launching the intent from FIDO2 API.
+                        intent.launchPendingIntent(a, MainActivity.REQUEST_FIDO2_REGISTER)
+
 
                     } catch (e: IntentSender.SendIntentException) {
                         Log.e(TAG, "Error launching pending intent for register request", e)
