@@ -17,6 +17,7 @@
 package com.example.android.fido2.ui.home
 
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -24,7 +25,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.example.android.fido2.repository.AuthRepository
 import com.example.android.fido2.repository.SignInState
-import com.google.android.gms.fido.fido2.Fido2PendingIntent
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -53,7 +53,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         repository.signOut()
     }
 
-    fun registerRequest(): LiveData<Fido2PendingIntent> {
+    fun registerRequest(): LiveData<PendingIntent> {
         return repository.registerRequest(_processing)
     }
 

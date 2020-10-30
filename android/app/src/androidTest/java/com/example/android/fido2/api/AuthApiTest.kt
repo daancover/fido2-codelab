@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AuthApiTest {
 
-    val api = AuthApi()
+    private val api = AuthApi()
 
     @Test
     fun username() {

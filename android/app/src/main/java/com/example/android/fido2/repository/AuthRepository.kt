@@ -16,6 +16,7 @@
 
 package com.example.android.fido2.repository
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -31,7 +32,6 @@ import com.example.android.fido2.api.Credential
 import com.example.android.fido2.toBase64
 import com.google.android.gms.fido.Fido
 import com.google.android.gms.fido.fido2.Fido2ApiClient
-import com.google.android.gms.fido.fido2.Fido2PendingIntent
 import com.google.android.gms.fido.fido2.api.common.AuthenticatorAssertionResponse
 import com.google.android.gms.fido.fido2.api.common.AuthenticatorAttestationResponse
 import com.google.android.gms.tasks.Task
@@ -167,7 +167,8 @@ class AuthRepository(
                 }
 
                 invokeSignInStateListeners(
-                    SignInState.SignInError(e.message ?: "Invalid login credentials" ))
+                    SignInState.SignInError(e.message ?: "Invalid login credentials")
+                )
             } finally {
                 processing.postValue(false)
             }
@@ -242,8 +243,8 @@ class AuthRepository(
      * Starts to register a new credential to the server. This should be called only when the
      * sign-in state is [SignInState.SignedIn].
      */
-    fun registerRequest(processing: MutableLiveData<Boolean>): LiveData<Fido2PendingIntent> {
-        val result = MutableLiveData<Fido2PendingIntent>()
+    fun registerRequest(processing: MutableLiveData<Boolean>): LiveData<PendingIntent> {
+        val result = MutableLiveData<PendingIntent>()
         executor.execute {
             fido2ApiClient?.let { client ->
                 processing.postValue(true)
@@ -251,7 +252,7 @@ class AuthRepository(
                     val token = prefs.getString(PREF_TOKEN, null)!!
                     val (options, challenge) = api.registerRequest(token)
                     lastKnownChallenge = challenge
-                    val task: Task<Fido2PendingIntent> = client.getRegisterIntent(options)
+                    val task: Task<PendingIntent> = client.getRegisterPendingIntent(options)
                     result.postValue(Tasks.await(task))
                 } catch (e: Exception) {
                     Log.e(TAG, "Cannot call registerRequest", e)
@@ -312,8 +313,8 @@ class AuthRepository(
      * Starts to sign in with a FIDO2 credential. This should only be called when the sign-in state
      * is [SignInState.SigningIn].
      */
-    fun signinRequest(processing: MutableLiveData<Boolean>): LiveData<Fido2PendingIntent> {
-        val result = MutableLiveData<Fido2PendingIntent>()
+    fun signinRequest(processing: MutableLiveData<Boolean>): LiveData<PendingIntent> {
+        val result = MutableLiveData<PendingIntent>()
         executor.execute {
             fido2ApiClient?.let { client ->
                 processing.postValue(true)
@@ -322,7 +323,7 @@ class AuthRepository(
                     val credentialId = prefs.getString(PREF_LOCAL_CREDENTIAL_ID, null)
                     val (options, challenge) = api.signinRequest(username, credentialId)
                     lastKnownChallenge = challenge
-                    val task = client.getSignIntent(options)
+                    val task = client.getSignPendingIntent(options)
                     result.postValue(Tasks.await(task))
                 } finally {
                     processing.postValue(false)
@@ -360,5 +361,4 @@ class AuthRepository(
             }
         }
     }
-
 }

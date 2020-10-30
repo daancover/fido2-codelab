@@ -17,24 +17,18 @@
 package com.example.android.fido2.ui.auth
 
 import android.content.Intent
-import android.content.IntentSender
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
-import com.example.android.fido2.MainActivity
+import com.example.android.fido2.MainActivity.Companion.REQUEST_FIDO2_SIGNIN
 import com.example.android.fido2.databinding.AuthFragmentBinding
 import com.example.android.fido2.ui.observeOnce
 
 class AuthFragment : Fragment() {
-
-    companion object {
-        private const val TAG = "AuthFragment"
-    }
 
     private val viewModel: AuthViewModel by viewModels()
     private lateinit var binding: AuthFragmentBinding
@@ -63,19 +57,18 @@ class AuthFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel.signinIntent.observeOnce(this) { intent ->
-            val a = activity
-            if (intent.hasPendingIntent() && a != null) {
-                try {
-                    intent.launchPendingIntent(a, MainActivity.REQUEST_FIDO2_SIGNIN)
-                } catch (e: IntentSender.SendIntentException) {
-                    Log.e(TAG, "Error launching pending intent for signin request", e)
-                }
-            }
+            activity?.startIntentSenderForResult(
+                intent.intentSender,
+                REQUEST_FIDO2_SIGNIN,
+                null, // fillInIntent
+                0, // flagsMask
+                0, // flagsValue
+                0 //extraFlags
+            )
         }
     }
 
     fun handleSignin(data: Intent) {
         viewModel.signinResponse(data)
     }
-
 }

@@ -17,9 +17,7 @@
 package com.example.android.fido2.ui.home
 
 import android.content.Intent
-import android.content.IntentSender
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +33,6 @@ import com.example.android.fido2.ui.observeOnce
 class HomeFragment : Fragment(), DeleteConfirmationFragment.Listener {
 
     companion object {
-        private const val TAG = "HomeFragment"
         private const val FRAGMENT_DELETE_CONFIRMATION = "delete_confirmation"
     }
 
@@ -97,14 +94,14 @@ class HomeFragment : Fragment(), DeleteConfirmationFragment.Listener {
         // FAB
         binding.add.setOnClickListener {
             viewModel.registerRequest().observeOnce(requireActivity()) { intent ->
-                val a = activity
-                if (intent.hasPendingIntent() && a != null) {
-                    try {
-                        intent.launchPendingIntent(a, MainActivity.REQUEST_FIDO2_REGISTER)
-                    } catch (e: IntentSender.SendIntentException) {
-                        Log.e(TAG, "Error launching pending intent for register request", e)
-                    }
-                }
+                activity?.startIntentSenderForResult(
+                    intent.intentSender,
+                    MainActivity.REQUEST_FIDO2_REGISTER,
+                    null, // fillInIntent
+                    0, // flagsMask
+                    0, // flagsValue
+                    0 //extraFlags
+                )
             }
         }
     }
